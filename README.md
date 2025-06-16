@@ -86,10 +86,9 @@ Since we have a keyless plan, no subscription is required, and we can use the `k
 Execute the following commands to produce and consume messages.
 ```bash
 docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-keyless-plan-ssl.properties --topic client-topic-1"
-"`
 ```
 ```bash
-docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-keyless-plan-ssl.properties --topic client-topic-1"`
+docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-keyless-plan-ssl.properties --topic client-topic-1"
 ```
 
 ## Secure My API with an API Key
@@ -118,8 +117,8 @@ Create a subscription between the application and the API via the developer port
 7. Produce and consume messages with the Kafka client 
 
 ```bash
-docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"`
+docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
 ```
 ```bash
-docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"`
+docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
 ```
