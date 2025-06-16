@@ -1,0 +1,114 @@
+{
+  "export": {
+    "date": "2025-06-16T09:06:26.381369212Z",
+    "apimVersion": "4.7.6"
+  },
+  "api": {
+    "definitionVersion": "V4",
+    "type": "NATIVE",
+    "listeners": [
+      {
+        "type": "KAFKA",
+        "host": "foo",
+        "entrypoints": [
+          {
+            "type": "native-kafka",
+            "configuration": {}
+          }
+        ]
+      }
+    ],
+    "endpointGroups": [
+      {
+        "name": "Default Broker group",
+        "type": "native-kafka",
+        "loadBalancer": {
+          "type": "ROUND_ROBIN"
+        },
+        "sharedConfiguration": "{\"security\":{\"protocol\":\"PLAINTEXT\"}}",
+        "endpoints": [
+          {
+            "name": "Default Broker",
+            "type": "native-kafka",
+            "weight": 1,
+            "inheritConfiguration": true,
+            "configuration": {
+              "bootstrapServers": "kafka:9091"
+            },
+            "secondary": false
+          }
+        ]
+      }
+    ],
+    "id": "7248ac6e-46eb-4236-88ac-6e46eb323626",
+    "name": "foo",
+    "description": "This is a Kafka Proxy to expose local Proxy.",
+    "apiVersion": "1.0.0",
+    "deployedAt": "2025-06-16T08:32:07.285Z",
+    "createdAt": "2025-06-13T18:19:38.64Z",
+    "updatedAt": "2025-06-16T08:39:26.212Z",
+    "disableMembershipNotifications": false,
+    "groups": [],
+    "state": "STARTED",
+    "visibility": "PRIVATE",
+    "lifecycleState": "CREATED",
+    "tags": [],
+    "primaryOwner": {
+      "id": "bdfe3e95-fc3d-42c0-be3e-95fc3de2c00b",
+      "displayName": "admin",
+      "type": "USER"
+    },
+    "originContext": {
+      "origin": "MANAGEMENT"
+    }
+  },
+  "members": [
+    {
+      "id": "bdfe3e95-fc3d-42c0-be3e-95fc3de2c00b",
+      "displayName": "admin",
+      "roles": [
+        {
+          "name": "PRIMARY_OWNER",
+          "scope": "API"
+        }
+      ]
+    }
+  ],
+  "metadata": [
+    {
+      "key": "email-support",
+      "name": "email-support",
+      "format": "MAIL",
+      "value": "${(api.primaryOwner.email)!''}",
+      "defaultValue": "support@change.me"
+    }
+  ],
+  "pages": [],
+  "plans": [
+    {
+      "definitionVersion": "V4",
+      "flows": [],
+      "id": "1060bb8e-8be5-49c9-a0bb-8e8be5c9c9df",
+      "name": "Default Keyless (UNSECURED)",
+      "description": "Default unsecured plan",
+      "apiId": "7248ac6e-46eb-4236-88ac-6e46eb323626",
+      "security": {
+        "type": "KEY_LESS",
+        "configuration": {}
+      },
+      "mode": "STANDARD",
+      "characteristics": [],
+      "commentRequired": false,
+      "createdAt": "2025-06-13T18:19:38.844Z",
+      "excludedGroups": [],
+      "order": 1,
+      "publishedAt": "2025-06-13T18:19:38.872Z",
+      "status": "PUBLISHED",
+      "tags": [],
+      "type": "API",
+      "updatedAt": "2025-06-13T18:19:38.872Z",
+      "validation": "MANUAL"
+    }
+  ],
+  "apiMedia": []
+}

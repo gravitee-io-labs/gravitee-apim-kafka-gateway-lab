@@ -1,0 +1,125 @@
+{
+  "export": {
+    "date": "2025-06-16T14:50:25.338966256Z",
+    "apimVersion": "4.8.0-alpha.2"
+  },
+  "api": {
+    "definitionVersion": "V4",
+    "type": "NATIVE",
+    "listeners": [
+      {
+        "type": "KAFKA",
+        "host": "foo",
+        "entrypoints": [
+          {
+            "type": "native-kafka",
+            "qos": "AUTO",
+            "configuration": {}
+          }
+        ],
+        "servers": []
+      }
+    ],
+    "endpointGroups": [
+      {
+        "name": "Default Broker group",
+        "type": "native-kafka",
+        "loadBalancer": {
+          "type": "ROUND_ROBIN"
+        },
+        "sharedConfiguration": "{\"security\":{\"protocol\":\"PLAINTEXT\"}}",
+        "endpoints": [
+          {
+            "name": "Default Broker",
+            "type": "native-kafka",
+            "weight": 1,
+            "inheritConfiguration": true,
+            "configuration": {
+              "bootstrapServers": "kafka:9091"
+            },
+            "secondary": false,
+            "tenants": []
+          }
+        ]
+      }
+    ],
+    "flows": [],
+    "id": "7248ac6e-46eb-4236-88ac-6e46eb323626",
+    "name": "foo",
+    "description": "This is a Kafka Proxy to expose local Proxy.",
+    "apiVersion": "1.0.0",
+    "deployedAt": "2025-06-16T12:36:30.635Z",
+    "createdAt": "2025-06-13T18:19:38.64Z",
+    "updatedAt": "2025-06-16T12:36:30.635Z",
+    "disableMembershipNotifications": false,
+    "groups": [],
+    "state": "STARTED",
+    "visibility": "PRIVATE",
+    "labels": [],
+    "lifecycleState": "PUBLISHED",
+    "tags": [],
+    "primaryOwner": {
+      "id": "bdfe3e95-fc3d-42c0-be3e-95fc3de2c00b",
+      "displayName": "admin",
+      "type": "USER"
+    },
+    "categories": [],
+    "originContext": {
+      "origin": "MANAGEMENT"
+    },
+    "responseTemplates": {},
+    "resources": [],
+    "properties": []
+  },
+  "members": [
+    {
+      "id": "bdfe3e95-fc3d-42c0-be3e-95fc3de2c00b",
+      "displayName": "admin",
+      "roles": [
+        {
+          "name": "PRIMARY_OWNER",
+          "scope": "API"
+        }
+      ]
+    }
+  ],
+  "metadata": [
+    {
+      "key": "email-support",
+      "name": "email-support",
+      "format": "MAIL",
+      "value": "${(api.primaryOwner.email)!''}",
+      "defaultValue": "support@change.me"
+    }
+  ],
+  "pages": [],
+  "plans": [
+    {
+      "definitionVersion": "V4",
+      "flows": [],
+      "id": "5228bf94-b8ea-4c6e-a8bf-94b8eadc6e23",
+      "name": "Secured API Key Plan",
+      "description": "This is a secured access to the Kafka Proxy Foo through an API Key",
+      "apiId": "7248ac6e-46eb-4236-88ac-6e46eb323626",
+      "security": {
+        "type": "API_KEY",
+        "configuration": {}
+      },
+      "mode": "STANDARD",
+      "characteristics": [],
+      "commentMessage": "",
+      "commentRequired": false,
+      "createdAt": "2025-06-16T12:32:09.504Z",
+      "excludedGroups": [],
+      "generalConditions": "",
+      "order": 1,
+      "publishedAt": "2025-06-16T12:33:11.45Z",
+      "status": "PUBLISHED",
+      "tags": [],
+      "type": "API",
+      "updatedAt": "2025-06-16T12:33:11.45Z",
+      "validation": "AUTO"
+    }
+  ],
+  "apiMedia": []
+}
