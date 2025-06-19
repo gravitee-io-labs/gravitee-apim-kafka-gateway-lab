@@ -100,7 +100,7 @@ Before starting, enable the next-gen (v2) Gravitee.io Developer Portal:
 
 Activate the new portal in the environment settings (Settings > Settings > Enable the New Developer Portal)
 Publish the `My Kafka Gateway API` API with the "Publish the API" button on the main page of the API
-Go to the next portal with the URL `http://localhost:8085/next/`
+
 
 1. Modify the My Kafka Gateway API > Consumer > Plan > Add new Plan > API Key
 2. Nothing specific to Kafka here, it's a standard plan in APIM. Add a Name and finish creating the plan
@@ -109,12 +109,14 @@ A dialog will open to confirm the closure of the unsecured Keyless plan and the 
 > It is not possible to have an unsecured plan and secured plans at the same time.
 4. Deploy the API now out of sync
 
-5. Subscribe to my API with the "Default Application"
+5. Go to the next portal with the URL `http://localhost:8085/next/`
+
+6. Subscribe to my API with the "Default Application"
 Create a subscription between the application and the API via the developer portal.\
 
-6. Complete the Kafka client configuration file `kafka-api-key-ssl.properties` with the API key as the password and an MD5 of the API key as the username, you can get that from the developer portal (My Kafka Gateway API > My Subscription > Open it > And use the information there)
+7. Complete the Kafka client configuration file `kafka-api-key-ssl.properties` with the API key as the password and an MD5 of the API key as the username, you can get that from the developer portal (My Kafka Gateway API > My Subscription > Open it > And use the information there)
 
-7. Produce and consume messages with the Kafka client 
+8. Produce and consume messages with the Kafka client 
 
 ```bash
 docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
@@ -122,3 +124,97 @@ docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --b
 ```bash
 docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
 ```
+
+## Control access to Kafka with ACL at the Gateway level
+
+Gravitee has multiple policies that can be applied at the gateway level to secure,control and govern access to the Kafka cluster.
+
+In this example we will use the ACL policy to limit which topics consumers and producers can interact with and limit rights.
+
+1. Modify the `My Kafka Gateway API`, Add a new flow in the common flows section. `My Kafka Gateway API` > Policies > Create a flow under the Common section (click on “+” next to Common Flow and give it a name or leave it blank).
+
+2. Add an ACL policy to the flow. Stay on the Global tab of the flow and click on the "+" in the interact phase between the Client and Broker. Select the ACL policy.
+
+3. Configure the ACL policy to only allow `read, write` to the `topic` `prefixed` with `client-topic-`.
+ACL Policy > ACL > Resource > + Add
+
+    - Select Option >  `Topic`
+    - Resource Pattern Type > `Prefixed`
+    - Resource Pattern > `client-topic-`
+    - Topic Opearations > Select `Read, Write`
+
+4. Configure the ACL policy (same as above) to allow `Groups` to be `read` (this is necessary for consumers otherwise they won't be able to get Consumer Groups)
+ACL Policy > ACL > Resource > + Add
+
+    - Select Option >  `Group`
+    - Resource Pattern Type > `ANY`
+    - Group Opearations > Select `Read`
+
+5. Save the ACL Policy
+
+6. Deploy the API (out of sync)
+
+7. Produce and consume messages with the Kafka client to test that the ACL policy is working correctly
+
+    - The following will drop Unauthorized errors when trying to produce or consume messages (note that the topic prefix doesn't match):
+
+      ```bash
+      docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-1"
+      ```
+
+      ```bash
+      docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-1"
+
+    - The following will be go through when trying to produce or consume messages (except for the initial UNKNOWN_TOPIC_OR_PARTITION message at the first produced message):
+
+    ```bash
+    docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-2"
+    ```
+
+    ```bash
+    docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-2"
+
+
+## Create customer friendly topic naming with the Topic Mapping policy
+
+In this example we will use the Topic Mapping policy to change the name of the topic exposed through the gateway to the client without changing the topic name in the Kafka cluster. This can be useful to avoid client modifications during a migration or to harmonize.
+
+1. Modify the `My Kafka Gateway API`, use the previous flow created in the above example for the ACL policy or create a new one if you skipped the previous section. Add a Kafka `Topic Mapping policy` in the Interact Phase
+`My Kafka Gateway API > Policies > Common Flow > Interact Phase > + Add a Topic Mapping Policy`
+
+2. Configure the Kafka Topic Mapping policy as follow:
+      - Client-side-name: `customer`
+      - Broker-side-name: `client-topic-1`
+  Save the policy.
+
+3. If you already have a Kafka ACL Policy in the flow, you'll need to either disable it ('...' on the Kafka ACL policy icon and `disable`) or edit it and add a new ACL resource to match the topic name `customer`.
+ACL Policy > ACL > Resource > + Add
+
+    - Select Option >  `Topic`
+    - Resource Pattern Type > `Match`
+    - Resource Pattern > `customer`
+    - Topic Opearations > Select `Read, Write`
+  Save the policy.
+
+4. Save the flow changes and deploy the API.
+
+5. Produce and consume messages with the Kafka client to test that the Topic Mapping and new ACL policy is working correctly
+
+    - The following will drop Unauthorized errors when trying to produce or consume messages (the topic client-topic-1 doesn't exist anymore when topic mapping is used ):
+
+      ```bash
+      docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
+      ```
+
+      ```bash
+      docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic client-topic-1"
+
+    - The following will be go through when trying to produce or consume messages:
+
+    ```bash
+    docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-producer.sh --bootstrap-server foo.kafka.local:9092 --producer.config config/kafka-api-key-plan-ssl.properties --topic customer"
+    ```
+
+    ```bash
+    docker exec -it gio_apim_kgw_kafka-client bash -c "kafka-console-consumer.sh --bootstrap-server foo.kafka.local:9092 --consumer.config config/kafka-api-key-plan-ssl.properties --topic customer"
+
